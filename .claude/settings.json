@@ -4,15 +4,52 @@
       "Bash(node --check *)",
       "Bash(node -c *)",
       "Bash(npm run test-unit)",
-      "Bash(npm run lint-check)"
+      "Bash(npm run lint-check)",
+      "Bash(homey api apps get-app-setting *)",
+      "Bash(homey api apps get-app-settings *)",
+      "Bash(homey api apps get-app-usage *)",
+      "Bash(homey api apps get-app *)",
+      "Bash(homey api devices get-device *)",
+      "Bash(homey api devices get-devices *)",
+      "Bash(homey api devices get-device-settings-obj *)",
+      "Bash(homey api logic get-variables *)",
+      "Bash(homey api insights get-log-entries *)",
+      "Bash(homey api insights get-logs *)",
+      "Bash(homey api notifications get-notifications *)",
+      "Bash(homey api flow get-advanced-flows *)"
     ]
   },
   "hooks": {
+    "UserPromptSubmit": [{
+      "hooks": [{
+        "type": "command",
+        "command": "node /root/github/com.homewizard/.claude/hooks/memory-recall-guard.js"
+      }]
+    }],
+    "PreToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "node /root/github/com.homewizard/.claude/hooks/compose-guard.js"
+      }]
+    }, {
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "node /root/github/com.homewizard/.claude/hooks/check-version-sync.js"
+      }, {
+        "type": "command",
+        "command": "node /root/github/com.homewizard/.claude/hooks/homey-dump-guard.js"
+      }]
+    }],
     "PostToolUse": [{
       "matcher": "Edit|Write",
       "hooks": [{
         "type": "command",
         "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.js|*.ts|*.tsx) node --check \"$f\" 2>/dev/null && npx eslint \"$f\" --max-warnings 0 ;; esac"
+      }, {
+        "type": "command",
+        "command": "node /root/github/com.homewizard/.claude/hooks/json-guard.js"
       }]
     }]
   }
